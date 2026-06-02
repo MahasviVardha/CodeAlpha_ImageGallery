@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luminary Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush: #ff8fab;
+      --baby: #ffc2d1;
+      --lavender: #e0bbff;
+      --cream: #fff5f8;
+      --pink: #ffd6e0;
+      --sky: #d6f0ff;
+      --white: #ffffff;
+      --peach: #ffd1a1;
+      --text: #4b4b4b;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --radius: 20px;
+      --pastel1: #ffd6e0;
+      --pastel2: #ffc2d1;
+      --pastel3: #e0bbff;
+      --pastel4: #d6f0ff;
+      --pastel5: #fff5f8;
+      --muted: #b08a99;
+      --border: rgba(255,143,171,0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 3.5rem 2rem 2rem;
+      text-align: center;
+      background: linear-gradient(160deg, var(--pastel1) 0%, var(--pastel3) 50%, var(--pastel4) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 50%;
+      top: -120px; left: -80px;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      bottom: -60px; right: -40px;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 700;
+      color: #b05070;
+      letter-spacing: -0.02em;
+      position: relative; z-index: 1;
+    }
+    header h1 em {
+      font-style: italic;
+      color: var(--blush);
+    }
+    header p {
+      color: #c07890;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      position: relative; z-index: 1;
+    }
+
+    /* ── FILTER BAR ── */
+    .filters {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 1.4rem 2rem;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,245,248,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.42rem 1.15rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      box-shadow: 0 2px 8px rgba(255,143,171,0.08);
+      flex-shrink: 0;
+    }
+    .filter-btn:hover {
+      border-color: var(--blush);
+      color: var(--blush);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(255,143,171,0.18);
+    }
+    .filter-btn.active {
+      background: var(--blush);
+      border-color: var(--blush);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(255,143,171,0.35);
+    }
+    .filter-btn .count-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50px;
+      font-size: 0.68rem;
+      padding: 0 0.4rem;
+      margin-left: 0.3rem;
+      line-height: 1.5;
+      vertical-align: middle;
+    }
+    .filter-btn:not(.active) .count-badge {
+      background: rgba(255,143,171,0.12);
+      color: var(--blush);
+    }
+
+    /* ── GALLERY ── */
+    .gallery-wrap {
+      padding: 2.5rem clamp(1rem, 4vw, 3rem);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .gallery {
+      columns: 4 270px;
+      column-gap: 1.1rem;
+    }
+
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 1.1rem;
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      transition: transform 0.32s cubic-bezier(.22,1,.36,1), box-shadow 0.32s ease;
+    }
+    .gallery-item:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 50px rgba(255,143,171,0.22);
+    }
+    .gallery-item:hover .overlay { opacity: 1; }
+    .gallery-item:hover img { transform: scale(1.07); }
+
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+      border-radius: var(--radius);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(255,143,171,0.82) 0%,
+        rgba(224,187,255,0.4) 55%,
+        transparent 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.3rem;
+    }
+    .overlay h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .overlay span {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.88);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .zoom-icon {
+      position: absolute;
+      top: 0.9rem;
+      right: 0.9rem;
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--blush);
+      font-size: 1.1rem;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .gallery-item.hidden { display: none; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(255,245,248,0.97);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .lightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .lightbox::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: var(--pastel3);
+      border-radius: 50%;
+      top: -200px; right: -150px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .lightbox::after {
+      content: '';
+      position: absolute;
+      width: 380px; height: 380px;
+      background: var(--pastel4);
+      border-radius: 50%;
+      bottom: -120px; left: -100px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .lb-img-wrap {
+      position: relative;
+      max-width: 82vw;
+      max-height: 76vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .lb-img-wrap img {
+      max-width: 82vw;
+      max-height: 74vh;
+      object-fit: contain;
+      border-radius: var(--radius);
+      box-shadow: 0 30px 80px rgba(255,143,171,0.25), 0 8px 24px rgba(0,0,0,0.08);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .lb-info {
+      position: absolute;
+      bottom: -3.8rem;
+      left: 0; right: 0;
+      text-align: center;
+    }
+    .lb-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: #b05070;
+    }
+    .lb-info span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .lb-close {
+      position: fixed;
+      top: 1.4rem; right: 1.6rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: var(--blush);
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(255,143,171,0.15);
+      z-index: 10;
+    }
+    .lb-close:hover {
+      background: var(--blush);
+      color: var(--white);
+      transform: scale(1.08);
+    }
+
+    .lb-nav {
+      position: fixed;
+      top: 50%; transform: translateY(-50%);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: var(--blush);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.22s;
+      box-shadow: 0 6px 20px rgba(255,143,171,0.15);
+      z-index: 10;
+    }
+    .lb-nav:hover {
+      background: var(--blush);
+      color: var(--white);
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 8px 28px rgba(255,143,171,0.3);
+    }
+    .lb-prev { left: 1.5rem; }
+    .lb-next { right: 1.5rem; }
+
+    .lb-counter {
+      position: fixed;
+      bottom: 5rem; left: 50%; transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      z-index: 10;
+    }
+
+    /* ── LIGHTBOX IMAGE FILTERS ── */
+    .lb-filters {
+      position: fixed;
+      bottom: 1.8rem;
+      left: 50%; transform: translateX(-50%);
+      display: flex;
+      gap: 0.45rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 0.5rem 0.9rem;
+      box-shadow: 0 8px 28px rgba(255,143,171,0.14);
+      z-index: 10;
+    }
+    .lb-filter-btn {
+      background: transparent;
+      border: 1.5px solid transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.85rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .lb-filter-btn:hover { color: var(--blush); }
+    .lb-filter-btn.active {
+      background: var(--pink);
+      border-color: var(--blush);
+      color: #b05070;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--muted);
+      display: none;
+    }
+    .empty.show { display: block; }
+    .empty p { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--blush); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .gallery { columns: 2 130px; }
+      .lb-nav { width: 40px; height: 40px; font-size: 1.1rem; }
+      .lb-prev { left: 0.4rem; }
+      .lb-next { right: 0.4rem; }
+      .lb-filters { flex-wrap: wrap; justify-content: center; max-width: 90vw; }
+    }
+
+    /* ── ADD PHOTO MODAL ── */
+    .add-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(255, 245, 248, 0.95);
+      backdrop-filter: blur(25px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .add-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .add-modal-content {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      width: 90vw;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2.5rem;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(255,143,171,0.22);
+      transform: scale(0.95) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2;
+    }
+    .add-modal.open .add-modal-content {
+      transform: scale(1) translateY(0);
+    }
+    .add-modal::before {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      background: var(--pastel4);
+      border-radius: 50%;
+      top: -100px; left: -100px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .add-modal::after {
+      content: '';
+      position: absolute;
+      width: 350px; height: 350px;
+      background: var(--pastel2);
+      border-radius: 50%;
+      bottom: -100px; right: -100px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .add-modal-close {
+      position: absolute;
+      top: 1.4rem; right: 1.6rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: var(--blush);
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(255,143,171,0.12);
+    }
+    .add-modal-close:hover {
+      background: var(--blush);
+      color: var(--white);
+      transform: scale(1.06);
+    }
+    .add-modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #b05070;
+      margin-bottom: 1.8rem;
+      text-align: center;
+    }
+    .add-modal h2 em {
+      font-style: italic;
+      color: var(--blush);
+    }
+    .add-modal-body {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .add-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+    .upload-tabs {
+      display: flex;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.25rem;
+      gap: 0.25rem;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.55rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.22s;
+    }
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--blush);
+      box-shadow: 0 2px 10px rgba(255,143,171,0.12);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .drag-drop-zone {
+      border: 2px dashed rgba(255,143,171,0.6);
+      background: var(--cream);
+      border-radius: var(--radius);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .drag-drop-zone.dragover {
+      border-color: var(--blush);
+      background: var(--baby);
+      transform: scale(0.99);
+    }
+    .upload-icon { font-size: 1.8rem; color: var(--blush); animation: pulse 2s infinite; }
+    .drag-text { font-size: 0.88rem; color: var(--text); }
+    .browse-link { color: var(--blush); font-weight: 500; text-decoration: underline; }
+    .file-info { font-size: 0.75rem; color: var(--muted); word-break: break-all; }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .input-group label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .input-group input[type="text"],
+    .input-group input[type="url"] {
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.22s;
+    }
+    .input-group input:focus {
+      border-color: var(--blush);
+      background: var(--white);
+      box-shadow: 0 4px 15px rgba(255,143,171,0.12);
+    }
+    .input-hint { font-size: 0.7rem; color: var(--muted); font-style: italic; }
+
+    .category-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.15rem;
+    }
+    .cat-pill {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.4rem 0.9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-pill:hover { border-color: var(--blush); color: var(--blush); }
+    .cat-pill.active {
+      background: var(--blush);
+      border-color: var(--blush);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(255,143,171,0.22);
+    }
+
+    .submit-btn {
+      background: var(--blush);
+      color: var(--white);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.85rem;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 6px 20px rgba(255,143,171,0.3);
+      transition: all 0.25s ease;
+      margin-top: 0.6rem;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255,143,171,0.45);
+      background: #f77c9a;
+    }
+    .submit-btn:active { transform: translateY(0); }
+    .sparkle { animation: spin 3s linear infinite; }
+
+    .live-preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      position: sticky;
+      top: 0;
+    }
+    .live-preview-container h3 {
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+    .preview-card {
+      margin-bottom: 0 !important;
+      cursor: default !important;
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+    }
+    .preview-card img { height: 100%; width: 100%; object-fit: cover; display: block; }
+    .preview-img-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: var(--cream);
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+      border-radius: var(--radius);
+      border: 2px dashed rgba(255,143,171,0.3);
+    }
+
+    /* Action buttons in filter bar */
+    .filters .add-btn {
+      background: var(--blush);
+      border-color: var(--blush);
+      color: var(--white);
+      font-weight: 500;
+      box-shadow: 0 4px 14px rgba(255,143,171,0.3);
+      margin-left: auto;
+    }
+    .filters .add-btn:hover {
+      background: #f77c9a;
+      border-color: #f77c9a;
+      color: var(--white);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(255,143,171,0.45);
+    }
+    .filters .reset-btn { border-color: var(--muted); color: var(--muted); opacity: 0.8; }
+    .filters .reset-btn:hover { border-color: var(--text); color: var(--text); opacity: 1; }
+    .filters .reset-btn.hidden { display: none; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .add-modal-content::-webkit-scrollbar { width: 8px; }
+    .add-modal-content::-webkit-scrollbar-track { background: var(--cream); border-radius: var(--radius); }
+    .add-modal-content::-webkit-scrollbar-thumb { background: var(--pink); border-radius: var(--radius); }
+    .add-modal-content::-webkit-scrollbar-thumb:hover { background: var(--blush); }
+
+    @media (max-width: 768px) {
+      .add-modal-body { grid-template-columns: 1fr; gap: 1.8rem; }
+      .add-modal-content { padding: 1.5rem; }
+      .preview-card { height: 220px; }
+      .filters .add-btn { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Luminary <em>Gallery</em></h1>
+  <p>A curated visual collection</p>
+</header>
+
+<div class="filters" id="filterBar">
+  <button class="filter-btn active" data-cat="all">✦ All <span class="count-badge" id="cnt-all"></span></button>
+  <button class="filter-btn" data-cat="nature">🌿 Nature <span class="count-badge" id="cnt-nature"></span></button>
+  <button class="filter-btn" data-cat="architecture">🏛 Architecture <span class="count-badge" id="cnt-architecture"></span></button>
+  <button class="filter-btn" data-cat="people">🌸 People <span class="count-badge" id="cnt-people"></span></button>
+  <button class="filter-btn" data-cat="abstract">🎨 Abstract <span class="count-badge" id="cnt-abstract"></span></button>
+  <button class="filter-btn" data-cat="travel">✈ Travel <span class="count-badge" id="cnt-travel"></span></button>
+  <button class="filter-btn" data-cat="animals">🐾 Animals <span class="count-badge" id="cnt-animals"></span></button>
+  <button class="filter-btn" data-cat="food">🍜 Food <span class="count-badge" id="cnt-food"></span></button>
+  <button class="filter-btn" data-cat="art">🖼 Art <span class="count-badge" id="cnt-art"></span></button>
+  <button class="filter-btn" data-cat="anime">✨ Anime <span class="count-badge" id="cnt-anime"></span></button>
+  <button class="filter-btn" data-cat="cartoon">🎠 Cartoon <span class="count-badge" id="cnt-cartoon"></span></button>
+  <button class="filter-btn reset-btn hidden" id="resetGalleryBtn" title="Reset gallery to default curated collection">↺ Reset</button>
+  <button class="filter-btn add-btn" id="openAddModalBtn">✦ Add Photo</button>
+</div>
+
+<div class="gallery-wrap">
+  <div class="gallery" id="gallery">
+
+    <!-- NATURE -->
+    <div class="gallery-item" data-cat="nature" data-title="Morning Forest" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80" alt="Morning Forest" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Morning Forest</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Ocean Horizon" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&q=80" alt="Ocean Horizon" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Ocean Horizon</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Misty Mountains" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80" alt="Misty Mountains" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Misty Mountains</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Mountain Peak" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1542676032-e505f4fe02a9?w=600&auto=format&fit=crop&q=60" alt="Mountain Peak" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Mountain Peak</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Wildflower Meadow" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1505129013025-ecf8f0168373?w=600&auto=format&fit=crop&q=60" alt="Wildflower Meadow" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Wildflower Meadow</h3><span>Nature</span></div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="gallery-item" data-cat="architecture" data-title="Glass & Steel" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80" alt="Glass and Steel" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Glass & Steel</h3><span>Architecture</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="architecture" data-title="Spiral Staircase" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Spiral Staircase" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Spiral Staircase</h3><span>Architecture</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="architecture" data-title="Urban Geometry" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1486304873000-235643847519?w=600&q=80" alt="Urban Geometry" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Urban Geometry</h3><span>Architecture</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="architecture" data-title="Ancient Arches" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Ancient Arches" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Ancient Arches</h3><span>Architecture</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="architecture" data-title="Minimalist Hall" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80" alt="Minimalist Hall" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Minimalist Hall</h3><span>Architecture</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="architecture" data-title="Bridge at Dusk" data-sub="Architecture">
+      <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80" alt="Bridge at Dusk" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Bridge at Dusk</h3><span>Architecture</span></div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div class="gallery-item" data-cat="people" data-title="Golden Hour" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=80" alt="Golden Hour" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Golden Hour</h3><span>People</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="people" data-title="Street Story" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1521119989659-a83eee488004?w=600&q=80" alt="Street Story" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Street Story</h3><span>People</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="people" data-title="Contemplation" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80" alt="Contemplation" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Contemplation</h3><span>People</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="people" data-title="Quiet Moment" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600&q=80" alt="Quiet Moment" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Quiet Moment</h3><span>People</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="people" data-title="Market Life" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80" alt="Market Life" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Market Life</h3><span>People</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="people" data-title="Laughter" data-sub="People">
+      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80" alt="Laughter" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Laughter</h3><span>People</span></div>
+    </div>
+
+    <!-- ABSTRACT -->
+    <div class="gallery-item" data-cat="abstract" data-title="Fluid Motion" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&q=80" alt="Fluid Motion" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Fluid Motion</h3><span>Abstract</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="abstract" data-title="Chromatic Burst" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=600&q=80" alt="Chromatic Burst" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Chromatic Burst</h3><span>Abstract</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="abstract" data-title="Neon Dream" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=600&q=80" alt="Neon Dream" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Neon Dream</h3><span>Abstract</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="abstract" data-title="Ink & Water" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1507908708918-778587c9e563?w=600&q=80" alt="Ink and Water" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Ink & Water</h3><span>Abstract</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="abstract" data-title="Golden Fractals" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=600&q=80" alt="Golden Fractals" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Golden Fractals</h3><span>Abstract</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="abstract" data-title="Smoke Trails" data-sub="Abstract">
+      <img src="https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?w=600&q=80" alt="Smoke Trails" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Smoke Trails</h3><span>Abstract</span></div>
+    </div>
+
+    <!-- TRAVEL -->
+    <div class="gallery-item" data-cat="travel" data-title="Santorini Blue" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&q=80" alt="Santorini Blue" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Santorini Blue</h3><span>Travel</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="travel" data-title="Tokyo Lights" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80" alt="Tokyo Lights" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Tokyo Lights</h3><span>Travel</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="travel" data-title="Desert Dunes" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80" alt="Desert Dunes" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Desert Dunes</h3><span>Travel</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="travel" data-title="Bali Temple" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80" alt="Bali Temple" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Bali Temple</h3><span>Travel</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="travel" data-title="Amalfi Coast" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?w=600&q=80" alt="Amalfi Coast" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Amalfi Coast</h3><span>Travel</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="travel" data-title="Northern Lights" data-sub="Travel">
+      <img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=600&q=80" alt="Northern Lights" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Northern Lights</h3><span>Travel</span></div>
+    </div>
+
+    <!-- NATURE (extra) -->
+    <div class="gallery-item" data-cat="nature" data-title="Cherry Blossoms" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&q=80" alt="Cherry Blossoms" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Cherry Blossoms</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Frozen Lake" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=600&q=80" alt="Frozen Lake" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Frozen Lake</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Autumn Canopy" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Autumn Canopy" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Autumn Canopy</h3><span>Nature</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="nature" data-title="Crashing Waves" data-sub="Nature">
+      <img src="https://images.unsplash.com/photo-1505765050516-f72dcac9c60e?w=600&q=80" alt="Crashing Waves" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Crashing Waves</h3><span>Nature</span></div>
+    </div>
+
+    <!-- ANIMALS -->
+    <div class="gallery-item" data-cat="animals" data-title="Majestic Lion" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600&q=80" alt="Majestic Lion" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Majestic Lion</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Snowy Owl" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1590418606746-018840f9ff6b?w=600&q=80" alt="Snowy Owl" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Snowy Owl</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Red Fox" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=600&q=80" alt="Red Fox" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Red Fox</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Elephant Walk" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=600&q=80" alt="Elephant Walk" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Elephant Walk</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Sleepy Cat" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80" alt="Sleepy Cat" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Sleepy Cat</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Playful Dolphin" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1570481662006-a3a1374699e8?w=600&q=80" alt="Playful Dolphin" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Playful Dolphin</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Giant Panda" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=600&q=80" alt="Giant Panda" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Giant Panda</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Curious Giraffe" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=600&q=80" alt="Curious Giraffe" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Curious Giraffe</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Hummingbird" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&q=80" alt="Hummingbird" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Hummingbird</h3><span>Animals</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="animals" data-title="Golden Retriever" data-sub="Animals">
+      <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&q=80" alt="Golden Retriever" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Golden Retriever</h3><span>Animals</span></div>
+    </div>
+
+    <!-- FOOD -->
+    <div class="gallery-item" data-cat="food" data-title="Ramen Bowl" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80" alt="Ramen Bowl" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Ramen Bowl</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Strawberry Cake" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&q=80" alt="Strawberry Cake" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Strawberry Cake</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Sushi Platter" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&q=80" alt="Sushi Platter" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Sushi Platter</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Fresh Tacos" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80" alt="Fresh Tacos" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Fresh Tacos</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Acai Bowl" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=600&q=80" alt="Acai Bowl" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Acai Bowl</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Latte Art" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=600&q=80" alt="Latte Art" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Latte Art</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Macarons" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&q=80" alt="Macarons" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Macarons</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Pizza Margherita" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pizza Margherita" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Pizza Margherita</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Mango Smoothie" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1546173159-315724a31696?w=600&q=80" alt="Mango Smoothie" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Mango Smoothie</h3><span>Food</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="food" data-title="Avocado Toast" data-sub="Food">
+      <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&q=80" alt="Avocado Toast" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Avocado Toast</h3><span>Food</span></div>
+    </div>
+
+    <!-- ART -->
+    <div class="gallery-item" data-cat="art" data-title="Oil Painting" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Oil Painting" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Oil Painting</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Street Mural" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1640876522584-283500dbe625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Street Mural" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Street Mural</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Watercolour Garden" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1464699908537-0954e50791ee?w=600&q=80" alt="Watercolour Garden" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Watercolour Garden</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Sculptor's Hand" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" alt="Sculptor's Hand" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Sculptor's Hand</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Ink Calligraphy" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80" alt="Ink Calligraphy" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Ink Calligraphy</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Abstract Canvas" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&q=80" alt="Abstract Canvas" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Abstract Canvas</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Mosaic Tiles" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&q=80" alt="Mosaic Tiles" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Mosaic Tiles</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Digital Illustration" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&q=80" alt="Digital Illustration" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Digital Illustration</h3><span>Art</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="art" data-title="Pencil Sketch" data-sub="Art">
+      <img src="https://images.unsplash.com/photo-1510832842230-87253f48d74b?w=600&q=80" alt="Pencil Sketch" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Pencil Sketch</h3><span>Art</span></div>
+    </div>
+
+    <!-- ANIME -->
+    <div class="gallery-item" data-cat="anime" data-title="Cherry Blossom Path" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80" alt="Cherry Blossom Path" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Cherry Blossom Path</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Neon City Night" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&q=80" alt="Neon City Night" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Neon City Night</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Torii Gate" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=600&q=80" alt="Torii Gate" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Torii Gate</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Rainy Lanterns" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80" alt="Rainy Lanterns" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Rainy Lanterns</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Sakura & Shrine" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=600&q=80" alt="Sakura and Shrine" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Sakura & Shrine</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Starlit Village" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80" alt="Starlit Village" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Starlit Village</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Misty Bamboo" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80" alt="Misty Bamboo" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Misty Bamboo</h3><span>Anime</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="anime" data-title="Floating Lanterns" data-sub="Anime">
+      <img src="https://images.unsplash.com/photo-1533294455009-a77b7557d2d1?w=600&q=80" alt="Floating Lanterns" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Floating Lanterns</h3><span>Anime</span></div>
+    </div>
+
+    <!-- CARTOON -->
+    <div class="gallery-item" data-cat="cartoon" data-title="Rainbow Balloons" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80" alt="Rainbow Balloons" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Rainbow Balloons</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Toy Figures" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&q=80" alt="Toy Figures" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Toy Figures</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Colourful Kites" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?w=600&q=80" alt="Colourful Kites" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Colourful Kites</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Comic Pop Art" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1601814933824-fd0b574dd592?w=600&q=80" alt="Comic Pop Art" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Comic Pop Art</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Rubber Ducks" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?w=600&q=80" alt="Rubber Ducks" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Rubber Ducks</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Candy World" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1499195333224-3ce974eecb47?w=600&q=80" alt="Candy World" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Candy World</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Pinwheel Fields" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1490902931801-d6f80ca94fe4?w=600&q=80" alt="Pinwheel Fields" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Pinwheel Fields</h3><span>Cartoon</span></div>
+    </div>
+
+    <div class="gallery-item" data-cat="cartoon" data-title="Painted Umbrellas" data-sub="Cartoon">
+      <img src="https://images.unsplash.com/photo-1502101872923-d48509bff386?w=600&q=80" alt="Painted Umbrellas" loading="lazy"/>
+      <div class="overlay"><div class="zoom-icon">⊕</div><h3>Painted Umbrellas</h3><span>Cartoon</span></div>
+    </div>
+
+  </div>
+  <div class="empty" id="empty"><p>No images here yet ✦</p></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lb-close" id="lbClose" aria-label="Close lightbox">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous image">‹</button>
+  <div class="lb-img-wrap">
+    <img id="lbImg" src="" alt=""/>
+    <div class="lb-info">
+      <h3 id="lbTitle"></h3>
+      <span id="lbSub"></span>
+    </div>
+  </div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next image">›</button>
+  <div class="lb-counter" id="lbCounter"></div>
+  <div class="lb-filters" role="group" aria-label="Image filters">
+    <button class="lb-filter-btn active" data-lbf="none">Original</button>
+    <button class="lb-filter-btn" data-lbf="grayscale(100%)">B&W</button>
+    <button class="lb-filter-btn" data-lbf="sepia(80%)">Sepia</button>
+    <button class="lb-filter-btn" data-lbf="saturate(1.5) hue-rotate(-15deg) brightness(1.05)">Warm</button>
+    <button class="lb-filter-btn" data-lbf="saturate(0.7) hue-rotate(20deg) brightness(0.94)">Cool</button>
+    <button class="lb-filter-btn" data-lbf="saturate(1.4) contrast(1.1)">Vivid</button>
+  </div>
+</div>
+
+<!-- ADD PHOTO MODAL -->
+<div class="add-modal" id="addModal" role="dialog" aria-modal="true" aria-label="Add new photo">
+  <div class="add-modal-content">
+    <button class="add-modal-close" id="addModalClose" aria-label="Close">✕</button>
+    <h2>Add New <em>Masterpiece</em></h2>
+    <div class="add-modal-body">
+      <form id="addPhotoForm" class="add-form">
+        <div class="upload-tabs">
+          <button type="button" class="tab-btn active" id="tabLocalBtn" data-tab="local">📂 Local Upload</button>
+          <button type="button" class="tab-btn" id="tabUrlBtn" data-tab="url">🔗 Image Link</button>
+        </div>
+        <div class="tab-content active" id="tabContentLocal">
+          <div class="drag-drop-zone" id="dragDropZone">
+            <span class="upload-icon">✦</span>
+            <p class="drag-text">Drag & drop your photo here or <span class="browse-link">browse</span></p>
+            <span class="file-info" id="fileInfo"></span>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+          </div>
+        </div>
+        <div class="tab-content" id="tabContentUrl">
+          <div class="input-group">
+            <label for="urlInput">Image URL</label>
+            <input type="url" id="urlInput" placeholder="https://images.unsplash.com/photo-..." autocomplete="off"/>
+            <span class="input-hint">Tip: Paste a link from Unsplash, Pexels, or any image host</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="titleInput">Title</label>
+          <input type="text" id="titleInput" placeholder="Give your masterpiece a name..." required autocomplete="off"/>
+        </div>
+        <div class="input-group">
+          <label>Category</label>
+          <div class="category-pills" id="categoryPills">
+            <div class="cat-pill active" data-cat="nature">🌿 Nature</div>
+            <div class="cat-pill" data-cat="architecture">🏛 Architecture</div>
+            <div class="cat-pill" data-cat="people">🌸 People</div>
+            <div class="cat-pill" data-cat="abstract">🎨 Abstract</div>
+            <div class="cat-pill" data-cat="travel">✈ Travel</div>
+            <div class="cat-pill" data-cat="animals">🐾 Animals</div>
+            <div class="cat-pill" data-cat="food">🍜 Food</div>
+            <div class="cat-pill" data-cat="art">🖼 Art</div>
+            <div class="cat-pill" data-cat="anime">✨ Anime</div>
+            <div class="cat-pill" data-cat="cartoon">🎠 Cartoon</div>
+          </div>
+          <input type="hidden" id="selectedCategory" value="nature" />
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span>Publish to Gallery</span>
+          <span class="sparkle">✦</span>
+        </button>
+      </form>
+      <div class="live-preview-container">
+        <h3>Live Preview</h3>
+        <div class="gallery-item preview-card" id="previewCard">
+          <div class="preview-img-placeholder" id="previewPlaceholder"><span>Photo Preview</span></div>
+          <img id="previewImg" src="" alt="Preview Image" style="display: none;" />
+          <div class="overlay" style="opacity: 1;">
+            <div class="zoom-icon">⊕</div>
+            <h3 id="previewTitleDisplay">Your Masterpiece</h3>
+            <span id="previewCategoryDisplay">Category</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── ELEMENT REFS ──
+  const gallery         = document.getElementById('gallery');
+  const lightbox        = document.getElementById('lightbox');
+  const lbImg           = document.getElementById('lbImg');
+  const lbTitle         = document.getElementById('lbTitle');
+  const lbSub           = document.getElementById('lbSub');
+  const lbCounter       = document.getElementById('lbCounter');
+  const addModal        = document.getElementById('addModal');
+  const openAddModalBtn = document.getElementById('openAddModalBtn');
+  const addModalClose   = document.getElementById('addModalClose');
+  const addPhotoForm    = document.getElementById('addPhotoForm');
+  const dragDropZone    = document.getElementById('dragDropZone');
+  const fileInput       = document.getElementById('fileInput');
+  const fileInfo        = document.getElementById('fileInfo');
+  const urlInput        = document.getElementById('urlInput');
+  const titleInput      = document.getElementById('titleInput');
+  const categoryPills   = document.getElementById('categoryPills');
+  const selectedCatInput= document.getElementById('selectedCategory');
+  const previewImg      = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+  const previewTitleDisplay   = document.getElementById('previewTitleDisplay');
+  const previewCategoryDisplay= document.getElementById('previewCategoryDisplay');
+  const tabLocalBtn     = document.getElementById('tabLocalBtn');
+  const tabUrlBtn       = document.getElementById('tabUrlBtn');
+  const tabContentLocal = document.getElementById('tabContentLocal');
+  const tabContentUrl   = document.getElementById('tabContentUrl');
+
+  let currentIndex        = 0;
+  let activeImportMethod  = 'local';
+  let currentCompressedImage = null;
+  // FIX 1: Track the current lightbox CSS filter separately from button state
+  let currentLbFilter     = 'none';
+
+  // ── LIGHTBOX ──
+  function getVisible() {
+    return [...document.querySelectorAll('.gallery-item:not(.hidden)')];
+  }
+
+  function openLightbox(item) {
+    const vis = getVisible();
+    currentIndex = vis.indexOf(item);
+    // FIX 1: Always reset filter to Original on open
+    resetLbFilter();
+    showSlide(currentIndex);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function showSlide(idx) {
+    const vis = getVisible();
+    if (!vis.length) return;
+    currentIndex = (idx + vis.length) % vis.length;
+    const item = vis[currentIndex];
+    // Use original src for user-added (base64) images; upgrade resolution for Unsplash URLs
+    const originalSrc = item.querySelector('img').src;
+    const src = originalSrc.startsWith('data:') ? originalSrc
+              : originalSrc.replace('w=600', 'w=1400');
+
+    lbImg.style.opacity = '0';
+    lbImg.style.transform = 'scale(0.96)';
+    setTimeout(() => {
+      lbImg.src = src;
+      lbImg.alt = item.dataset.title;
+      lbTitle.textContent = item.dataset.title;
+      lbSub.textContent   = item.dataset.sub;
+      lbCounter.textContent = `${currentIndex + 1} / ${vis.length}`;
+      // FIX 1: Re-apply current filter after src change
+      lbImg.style.filter = currentLbFilter === 'none' ? '' : currentLbFilter;
+      lbImg.style.opacity = '1';
+      lbImg.style.transform = 'scale(1)';
+    }, 150);
+  }
+
+  // FIX 1: Helper to reset filter UI + state
+  function resetLbFilter() {
+    currentLbFilter = 'none';
+    lbImg.style.filter = '';
+    document.querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.lb-filter-btn[data-lbf="none"]').classList.add('active');
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  gallery.addEventListener('click', e => {
+    const item = e.target.closest('.gallery-item');
+    if (item) openLightbox(item);
+  });
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', () => showSlide(currentIndex - 1));
+  document.getElementById('lbNext').addEventListener('click', () => showSlide(currentIndex + 1));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+  // FIX 2: Unified keyboard handler — no duplicate Escape conflicts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (lightbox.classList.contains('open')) { closeLightbox(); return; }
+      if (addModal.classList.contains('open'))  { closeAddModal();  return; }
+    }
+    if (lightbox.classList.contains('open')) {
+      if (e.key === 'ArrowRight') showSlide(currentIndex + 1);
+      if (e.key === 'ArrowLeft')  showSlide(currentIndex - 1);
+    }
+  });
+
+  // FIX 1: Store filter in state so navigation preserves it correctly
+  document.querySelectorAll('.lb-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLbFilter = btn.dataset.lbf;
+      lbImg.style.filter = currentLbFilter === 'none' ? '' : currentLbFilter;
+    });
+  });
+
+  // Touch swipe
+  let tx = 0;
+  lightbox.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  lightbox.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) dx < 0 ? showSlide(currentIndex + 1) : showSlide(currentIndex - 1);
+  });
+
+  // ── CATEGORY FILTER + COUNT BADGES ──
+  function updateCountBadges() {
+    const all = [...document.querySelectorAll('.gallery-item')];
+    const cats = ['nature','architecture','people','abstract','travel','animals','food','art','anime','cartoon'];
+    document.getElementById('cnt-all').textContent = all.length;
+    cats.forEach(cat => {
+      const el = document.getElementById('cnt-' + cat);
+      if (el) el.textContent = all.filter(i => i.dataset.cat === cat).length;
+    });
+  }
+
+  document.getElementById('filterBar').addEventListener('click', e => {
+    const btn = e.target.closest('[data-cat]');
+    if (!btn || btn.id === 'openAddModalBtn') return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      item.classList.toggle('hidden', cat !== 'all' && item.dataset.cat !== cat);
+    });
+    document.getElementById('empty').classList.toggle('show', getVisible().length === 0);
+  });
+
+  // ── PERSISTENCE: Load saved user photos ──
+  let userPhotos = [];
+  try { userPhotos = JSON.parse(localStorage.getItem('luminary_user_photos')) || []; }
+  catch(e) { userPhotos = []; }
+
+  function createGalleryItemHTML(photo) {
+    return `<div class="gallery-item user-added" data-cat="${photo.cat}" data-title="${escapeHtml(photo.title)}" data-sub="${escapeHtml(photo.sub)}">
+      <img src="${photo.src}" alt="${escapeHtml(photo.title)}" loading="lazy"/>
+      <div class="overlay">
+        <div class="zoom-icon">⊕</div>
+        <h3>${escapeHtml(photo.title)}</h3><span>${escapeHtml(photo.sub)}</span>
+      </div>
+    </div>`;
+  }
+
+  // FIX 3: Basic XSS guard for user-supplied strings injected into HTML
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function renderUserPhotos() {
+    userPhotos.forEach(photo => {
+      gallery.insertAdjacentHTML('afterbegin', createGalleryItemHTML(photo));
+    });
+    toggleResetBtn();
+    updateCountBadges();
+  }
+
+  function toggleResetBtn() {
+    const btn = document.getElementById('resetGalleryBtn');
+    if (btn) btn.classList.toggle('hidden', userPhotos.length === 0);
+  }
+
+  renderUserPhotos();
+
+  // Reset gallery
+  document.getElementById('resetGalleryBtn').addEventListener('click', () => {
+    if (confirm('Clear your custom photos and restore the default curated collection?')) {
+      localStorage.removeItem('luminary_user_photos');
+      window.location.reload();
+    }
+  });
+
+  // ── ADD MODAL ──
+  function openAddModal() {
+    addModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    resetModalForm();
+  }
+  function closeAddModal() {
+    addModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  openAddModalBtn.addEventListener('click', openAddModal);
+  addModalClose.addEventListener('click', closeAddModal);
+  addModal.addEventListener('click', e => { if (e.target === addModal) closeAddModal(); });
+
+  function resetModalForm() {
+    addPhotoForm.reset();
+    currentCompressedImage = null;
+    previewImg.src = '';
+    previewImg.style.display = 'none';
+    previewPlaceholder.style.display = 'flex';
+    previewPlaceholder.querySelector('span').textContent = 'Photo Preview';
+    fileInfo.textContent = '';
+    previewTitleDisplay.textContent = 'Your Masterpiece';
+    previewCategoryDisplay.textContent = 'Nature';
+    switchTab('local');
+    document.querySelectorAll('.cat-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.cat === 'nature');
+    });
+    selectedCatInput.value = 'nature';
+  }
+
+  // Tab switcher
+  function switchTab(method) {
+    activeImportMethod = method;
+    const isLocal = method === 'local';
+    tabLocalBtn.classList.toggle('active', isLocal);
+    tabUrlBtn.classList.toggle('active', !isLocal);
+    tabContentLocal.classList.toggle('active', isLocal);
+    tabContentUrl.classList.toggle('active', !isLocal);
+    if (isLocal) {
+      urlInput.removeAttribute('required');
+      previewImg.src = currentCompressedImage || '';
+      previewImg.style.display = currentCompressedImage ? 'block' : 'none';
+      previewPlaceholder.style.display = currentCompressedImage ? 'none' : 'flex';
+    } else {
+      urlInput.setAttribute('required','true');
+      updateUrlPreview();
+    }
+  }
+
+  tabLocalBtn.addEventListener('click', () => switchTab('local'));
+  tabUrlBtn.addEventListener('click',   () => switchTab('url'));
+
+  // Live preview updates
+  titleInput.addEventListener('input', e => {
+    previewTitleDisplay.textContent = e.target.value.trim() || 'Your Masterpiece';
+  });
+
+  categoryPills.addEventListener('click', e => {
+    const pill = e.target.closest('.cat-pill');
+    if (!pill) return;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    const cat = pill.dataset.cat;
+    selectedCatInput.value = cat;
+    previewCategoryDisplay.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+  });
+
+  urlInput.addEventListener('input', updateUrlPreview);
+  function updateUrlPreview() {
+    if (activeImportMethod !== 'url') return;
+    const url = urlInput.value.trim();
+    previewImg.src = url || '';
+    previewImg.style.display = url ? 'block' : 'none';
+    previewPlaceholder.style.display = url ? 'none' : 'flex';
+  }
+
+  previewImg.addEventListener('error', () => {
+    if (previewImg.style.display === 'block') {
+      previewImg.style.display = 'none';
+      previewPlaceholder.style.display = 'flex';
+      previewPlaceholder.querySelector('span').textContent = 'Invalid image URL';
+    }
+  });
+  previewImg.addEventListener('load', () => {
+    previewPlaceholder.querySelector('span').textContent = 'Photo Preview';
+  });
+
+  // Drag & drop
+  ['dragenter','dragover'].forEach(ev =>
+    dragDropZone.addEventListener(ev, e => { e.preventDefault(); dragDropZone.classList.add('dragover'); })
+  );
+  ['dragleave','drop'].forEach(ev =>
+    dragDropZone.addEventListener(ev, e => { e.preventDefault(); dragDropZone.classList.remove('dragover'); })
+  );
+  dragDropZone.addEventListener('drop', e => {
+    const files = e.dataTransfer.files;
+    if (files.length) handleSelectedFile(files[0]);
+  });
+  dragDropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => {
+    if (e.target.files.length) handleSelectedFile(e.target.files[0]);
+  });
+
+  function handleSelectedFile(file) {
+    if (!file.type.startsWith('image/')) { alert('Please upload a valid image file.'); return; }
+    fileInfo.textContent = `${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        const max = 1000;
+        if (w > h) { if (w > max) { h = Math.round(h * max / w); w = max; } }
+        else        { if (h > max) { w = Math.round(w * max / h); h = max; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        currentCompressedImage = canvas.toDataURL('image/jpeg', 0.78);
+        previewImg.src = currentCompressedImage;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Form submission
+  addPhotoForm.addEventListener('submit', e => {
+    e.preventDefault();
+    let imgSrc = '';
+    if (activeImportMethod === 'local') {
+      if (!currentCompressedImage) { alert('Please select an image file first.'); return; }
+      imgSrc = currentCompressedImage;
+    } else {
+      imgSrc = urlInput.value.trim();
+      if (!imgSrc) { alert('Please enter a valid image URL.'); return; }
+    }
+    const title = titleInput.value.trim();
+    const cat   = selectedCatInput.value;
+    const sub   = cat.charAt(0).toUpperCase() + cat.slice(1);
+    const newPhoto = { cat, title, sub, src: imgSrc };
+
+    userPhotos.unshift(newPhoto);
+    try {
+      localStorage.setItem('luminary_user_photos', JSON.stringify(userPhotos));
+    } catch(err) {
+      alert('Storage full! Use "Image Link" tab or reset the gallery first.');
+      userPhotos.shift();
+      return;
+    }
+
+    gallery.insertAdjacentHTML('afterbegin', createGalleryItemHTML(newPhoto));
+    updateCountBadges();
+    toggleResetBtn();
+    closeAddModal();
+
+    // Re-apply active category filter so new item respects it
+    const activeCat = document.querySelector('.filter-btn.active')?.dataset.cat || 'all';
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      item.classList.toggle('hidden', activeCat !== 'all' && item.dataset.cat !== activeCat);
+    });
+    document.getElementById('empty').classList.toggle('show', getVisible().length === 0);
+
+    // Toast notification
+    showToast(`✦ "${title}" published!`);
+  });
+
+  function showToast(message) {
+    const toast = Object.assign(document.createElement('div'), { textContent: message });
+    Object.assign(toast.style, {
+      position:'fixed', bottom:'2rem', left:'50%',
+      transform:'translateX(-50%) translateY(20px)',
+      background:'var(--blush)', color:'var(--white)',
+      padding:'0.8rem 1.6rem', borderRadius:'50px',
+      fontSize:'0.85rem', letterSpacing:'0.05em',
+      boxShadow:'0 8px 24px rgba(255,143,171,0.4)',
+      zIndex:'1100', opacity:'0', transition:'all 0.35s ease'
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.transform='translateX(-50%) translateY(0)'; toast.style.opacity='1'; }, 50);
+    setTimeout(() => {
+      toast.style.transform='translateX(-50%) translateY(10px)'; toast.style.opacity='0';
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  // Init badges on page load
+  updateCountBadges();
+</script>
+</body>
+</html>
