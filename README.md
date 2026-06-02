@@ -3,7 +3,7 @@
 A beautiful, responsive image gallery built with HTML, CSS, and JavaScript.
 
 ## Live Demo
-[View Live](luminarygallery.netlify.app/)
+[View Live](https://luminarygallery.netlify.app/)
 
 ##  Features
 - 78 images across 10 categories (Nature, Animals, Food, Anime, Art & more)
