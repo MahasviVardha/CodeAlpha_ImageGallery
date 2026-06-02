@@ -20,9 +20,6 @@ A beautiful, responsive image gallery built with HTML, CSS, and JavaScript.
 - CSS3 (Masonry layout, CSS Variables)
 - Vanilla JavaScript
 
-##  Screenshot
-![Luminary Gallery Screenshot](screenshot.png)
-
 ##  How to Run
 1. Clone the repo
 ```bash
