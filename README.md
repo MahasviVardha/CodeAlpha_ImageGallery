@@ -30,8 +30,8 @@ A beautiful, responsive image gallery built with HTML, CSS, and JavaScript.
 ```
 2. Open `index.html` in your browser
 
-## 👩‍💻 Author
+##  Author
 **Mahasvi Vardha** — [LinkedIn](https://www.linkedin.com/in/mahasvi-vardha-656705378/)
 
-## 📄 License
+##  License
 This project was built as part of the CodeAlpha Frontend Development Internship.
